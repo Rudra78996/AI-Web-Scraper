@@ -34,18 +34,20 @@ app.post('/scrap', async (req, res) => {
   });
   
 
-app.get("/chat", async (req, res)=>{
-    const {message, scrapedData, websiteLink} = req.body;
+app.post("/chat", async (req, res) => {
+    const { message, scrapedData, websiteLink } = req.body;
     if (!message || !websiteLink || !scrapedData) {
         return res.status(400).json({ error: "Missing required fields" });
     }
-    try{
+    try {
         const data = await chat(message, scrapedData, websiteLink);
-        res.json({result : data}); 
-    } catch(e){
-        return res.status(404).json({error : "Error"});
+        res.status(200).json({ result: data });
+    } catch (e) {
+        console.error("Chat error:", e);
+        res.status(500).json({ error: "Error processing chat request" });
     }
 });
+
 
 app.listen(port, () => {
     console.log(`http://localhost:${port}/`);
