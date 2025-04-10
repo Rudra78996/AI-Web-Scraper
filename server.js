@@ -12,17 +12,27 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-app.get('/scrap', (req, res) => {
-    res.set('Access-Control-Allow-Origin', '*');
-    const {url} = req.body;
-    console.log(url);
-    scrapeWebsiteText(url)
-    .then(text => res.json({"data": text}))
-    .catch(err =>{
-        res.send("Error 404");
-        console.error(err)
-    });
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
 });
+
+app.post('/scrap', async (req, res) => {
+    const { url } = req.body;
+  
+    if (!url) {
+      return res.status(400).json({ error: "URL is required" });
+    }
+  
+    try {
+      const text = await scrapeWebsiteText(url);
+      res.status(200).json({ data: text });
+    } catch (err) {
+      console.error('Scraping error:', err);
+      res.status(500).json({ error: "Failed to scrape website" });
+    }
+  });
+  
 
 app.get("/chat", async (req, res)=>{
     const {message, scrapedData, websiteLink} = req.body;

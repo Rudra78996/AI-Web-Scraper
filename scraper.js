@@ -4,7 +4,13 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 puppeteer.use(StealthPlugin());
 
 async function scraper(url) {
+    console.log("Starting the scraper function...");
+    console.log("URL provided:", url);
+    
     try {
+        if (!url || typeof url !== "string" || !/^https?:\/\//.test(url)) {
+            throw new Error("Invalid URL provided to the scraper function.");
+        }
         const browser = await puppeteer.launch({
             headless: "new",
             executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || (await import("puppeteer")).executablePath(),
@@ -32,7 +38,7 @@ async function scraper(url) {
 
     } catch (error) {
         console.error("Error scraping website:", error);
-        return null;
+        return null; 
     }
 }
 
